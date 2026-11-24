@@ -1,34 +1,46 @@
+<div align="center">
+
 # whatdahack → Discord
 
-Posts every new hackathon from [whatdahack.pl](https://whatdahack.pl) to a Discord channel.
-Runs on GitHub Actions every 3 hours, free, no server.
+Posts new hackathons from [whatdahack.pl](https://whatdahack.pl) to a Discord channel.<br/>
+Runs every 3 hours on GitHub Actions.
 
-It watches the site's public `sitemap.xml` for new `/events/...` pages and reads each
-event's details (name, dates, place, organizer, registration link) from the page's
-schema.org data.
+[![Notify](https://github.com/filekk/whatdahack_discord/actions/workflows/notify.yml/badge.svg)](https://github.com/filekk/whatdahack_discord/actions/workflows/notify.yml)
+![Python](https://img.shields.io/badge/python-3.9%2B-blue)
+[![License](https://img.shields.io/badge/license-Apache%202.0-lightgrey)](LICENSE)
 
-## Setup (≈5 min)
+[**Use this template**](https://github.com/filekk/whatdahack_discord/generate) · [Setup](#setup) · [Options](#options)
 
-1. **Discord webhook** – in your server: channel → ⚙️ Edit Channel → Integrations →
-   Webhooks → New Webhook → Copy Webhook URL.
-2. **Repo** – create a new GitHub repo (private is fine) and push these files:
-   ```
-   notify.py
-   .github/workflows/notify.yml
-   ```
-3. **Secret** – repo → Settings → Secrets and variables → Actions → New repository secret:
-   `DISCORD_WEBHOOK_URL` = the webhook URL.
-4. **(Optional) city filter** – same page, *Variables* tab → `CITY_FILTER`,
-   e.g. `Łódź,Warszawa,online`. Leave unset to get everything.
-5. **First run** – Actions tab → *whatdahack → Discord* → Run workflow.
-   The first run only records the ~190 existing events (nothing is posted);
-   from then on, only new ones appear in Discord.
+</div>
 
-## Test locally
+---
 
-```bash
-DRY_RUN=1 python3 notify.py   # first run: seeds seen.json
-rm seen.json                  # (or delete a few lines from it to see embeds printed)
-```
+## Setup
 
-To force a test post, delete one URL from `seen.json` and run the workflow.
+1. Click **Use this template** (or fork; if you fork, enable workflows in the **Actions** tab).
+2. Create a webhook in Discord (channel settings → **Integrations** → **Webhooks**) and add its URL
+   as a repository secret called `DISCORD_WEBHOOK_URL`.
+3. Run the workflow once from the **Actions** tab. The first run only saves the events already
+   on the site, so nothing gets posted. After that, only new ones are posted.
+
+## Options
+
+Optional repository variables:
+
+| Variable | Default | Description |
+|---|---|---|
+| `CITY_FILTER` | *(all)* | Comma-separated cities to keep, e.g. `Łódź,Warszawa,online` |
+| `ONLY_UPCOMING` | `1` | Skip events that already ended |
+
+## How it works
+
+The script reads the site's `sitemap.xml`, finds event pages it hasn't seen yet, and posts
+their details to the webhook. Seen events are stored in `seen.json` on the `state` branch.
+
+To test locally: `DRY_RUN=1 python3 notify.py` (Python 3.9+, no dependencies).
+
+---
+
+<div align="center">
+<sub>Unofficial, not affiliated with whatdahack.pl</sub>
+</div>
